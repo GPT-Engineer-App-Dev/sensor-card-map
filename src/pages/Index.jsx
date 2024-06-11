@@ -1,19 +1,48 @@
-// Update this page (the content is just a fallback if you fail and example)
-// Use chakra-ui
-import { Container, Text, VStack } from "@chakra-ui/react";
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { Box } from '@chakra-ui/react';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+import { useEffect, useState } from 'react';
 
-// Example of using react-icons
-// import { FaRocket } from "react-icons/fa";
-// <IconButton aria-label="Add" icon={<FaRocket />} size="lg" />; // IconButton would also have to be imported from chakra
+// Custom pin icon
+const pinIcon = new L.Icon({
+  iconUrl: require('../assets/pin-icon.png'),
+  iconRetinaUrl: require('../assets/pin-icon.png'),
+  iconSize: [35, 35],
+  iconAnchor: [17, 35],
+  popupAnchor: [0, -35],
+});
 
 const Index = () => {
+  const [markers, setMarkers] = useState([]);
+
+  useEffect(() => {
+    // Generate 10 random markers for buildings in Oslo
+    const osloCenter = { lat: 59.9139, lng: 10.7522 };
+    const randomMarkers = Array.from({ length: 10 }).map(() => ({
+      position: {
+        lat: osloCenter.lat + (Math.random() - 0.5) * 0.1,
+        lng: osloCenter.lng + (Math.random() - 0.5) * 0.1,
+      },
+      data: 'Proptech sensor data placeholder',
+    }));
+    setMarkers(randomMarkers);
+  }, []);
+
   return (
-    <Container centerContent maxW="container.md" height="100vh" display="flex" flexDirection="column" justifyContent="center" alignItems="center">
-      <VStack spacing={4}>
-        <Text fontSize="2xl">Your Blank Canvas</Text>
-        <Text>Chat with the agent to start making edits.</Text>
-      </VStack>
-    </Container>
+    <Box height="100vh" width="100vw">
+      <MapContainer center={[59.9139, 10.7522]} zoom={13} style={{ height: '100%', width: '100%' }}>
+        <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        />
+        {markers.map((marker, index) => (
+          <Marker key={index} position={marker.position} icon={pinIcon}>
+            <Popup>{marker.data}</Popup>
+          </Marker>
+        ))}
+      </MapContainer>
+    </Box>
   );
 };
 
